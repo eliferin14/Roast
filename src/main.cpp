@@ -95,19 +95,13 @@ void setup() {
 
     // Inizializzo la variabile t
     t = micros();
+    Serial.println("Dutycycle: %.2f, Target: %.2f, Speed: %.2f\n");
 }
 
 
 
 // ================================ LOOP ========================================
 void loop() {
-
-    // Se il motore non deve girare, skippo il ciclo in blocco
-    if ( !rotate && 0 ) {
-        //Serial.println("# Resting");
-        Serial.printf("%.2f, %.2f, %.2f\n", dutyCycle, target, speed);
-        return;
-    }
 
     // Calcolo del periodo deltaT
     oldT = t;
@@ -128,11 +122,14 @@ void loop() {
         // Integrale
         gainI += ki * error * (float)deltaT/1000000.0;
 
-    // Calcolo il dutycycle da applicare e lo applico
+    // Calcolo il dutycycle da applicare
     dutyCycle = gainP + gainI;
+
     // Controllo la saturazione
     if (dutyCycle > 1) dutyCycle = 1;
-    if (target == 0) dutyCycle = 0;     // Per risparmiare energia
+    if (target == 0 && speed == 0) dutyCycle = 0;     // Per risparmiare energia
+
+    // Imposto il dutycycle
     setDutyCycle(dutyCycle);
 
     // Logging
